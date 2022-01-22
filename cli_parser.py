@@ -13,6 +13,7 @@ class Parser(argparse.ArgumentParser):
             help="if specified, run only these models, otherwise run all available models",
             default=[models[0]],
             type=str,
+            nargs='*'
         )
 
         self.add_argument(
