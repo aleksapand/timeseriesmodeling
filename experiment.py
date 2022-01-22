@@ -51,8 +51,8 @@ class ExperimentResult:
         self.lookback_horizon = lookback_horizon
         self.prediction_horizon = prediction_horizon
 
-        self.metrict_train = metrics_train
-        self.metrict_test = metrics_test
+        self.metrics_train = metrics_train
+        self.metrics_test = metrics_test
 
         self.train_index = train_index
         self.train_target = train_target
@@ -67,10 +67,10 @@ class ExperimentResult:
             "model_class": self.model_class,
             "input_features": self.input_features,
             "target_features": self.target_features,
-            "lookback_horizon": self.lookback_horizon,                
+            "lookback_horizon": self.lookback_horizon,
             "prediction_horizon": self.prediction_horizon,
-            "metrics_train": self.metrict_train,
-            "metrics_test": self.metrict_test,
+            "metrics_train": self.metrics_train,
+            "metrics_test": self.metrics_test,
         }
 
     def to_file(self, file_path):
