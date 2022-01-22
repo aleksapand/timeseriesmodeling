@@ -1,30 +1,24 @@
 # supresses tensorflow warnings
+from datavisualization import ConsumptionPlotter
+import training
+import data.loader as loader
+from cli_parser import Parser
+from datetime import datetime
+from os import makedirs
+from pathlib import Path
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.pyplot as plt
+import pandas as pd
+import json
+from experiment import ExperimentResult
+from numpy.lib.function_base import append
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
-from numpy.lib.function_base import append
-from experiment import ExperimentResult
-
-import json
-import pandas as pd
-import matplotlib.pyplot as plt
-
-from matplotlib.ticker import FormatStrFormatter
-
-from pathlib import Path
-from os import makedirs
-from datetime import datetime
-
-from cli_parser import Parser
-import data.loader as loader
-import training
-
-from datavisualization import ConsumptionPlotter
-
 def append_to_results(json_file_path, result: ExperimentResult, result_name: str):
     if json_file_path.is_file():
-        with(json_file_path, 'r') as fp:
+        with open(json_file_path, 'r') as fp:
             json_dict = json.load(fp)
     else:
         json_dict = {}
@@ -35,13 +29,12 @@ def append_to_results(json_file_path, result: ExperimentResult, result_name: str
 
 
 def run():
-    
+
     parser = Parser(
-        list(training.model_to_class.keys()), 
-        training.all_features, 
+        list(training.model_to_class.keys()),
+        training.all_features,
         list(training.normalization_to_class.keys()))
     args = parser.parse_args()
-
 
     models = args.models
     lookback_horizons = args.lookback_horizons
@@ -55,17 +48,17 @@ def run():
     validation_split = args.validation_split
     plot_image_format = args.plot_image_format
 
-
     results_dir_root = 'results'
-    results_dir_run = Path(results_dir_root).joinpath(datetime.now().strftime("%Y%m%d-%H%M%S"))
+    results_dir_run = Path(results_dir_root).joinpath(
+        datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     makedirs(results_dir_run)
 
     data = loader.load_data()
 
     experiments = [
-        (m, l, p) 
-        for m in models 
+        (m, l, p)
+        for m in models
         for l in lookback_horizons
         for p in prediction_horizons
     ]
@@ -78,22 +71,23 @@ def run():
             normalization,
             input_features,
             target_features=target_features,
-            lookback_horizon=lookback_horizon, 
-            prediction_horizon=prediction_horizon, 
+            lookback_horizon=lookback_horizon,
+            prediction_horizon=prediction_horizon,
             training_split=training_split,
             epochs=epochs,
             batch_size=batch_size,
             validation_split=validation_split)
 
-        print('experiment successful, saving results.') 
+        print('experiment successful, saving results.')
 
         result_name = f'experiment_{i}'
         """
         Write to results
 
         """
-        append_to_results(results_dir_run.joinpath('results.json'), result, result_name)
-        
+        append_to_results(results_dir_run.joinpath(
+            'results.json'), result, result_name)
+
         """
         Generate and save plot
         
@@ -117,6 +111,7 @@ def run():
 
         with open(results_dir_run.joinpath(f'{result_name}.{plot_image_format}'), "wb") as fp:
             plt.savefig(fp, format=plot_image_format)
+
 
 if __name__ == '__main__':
     run()
